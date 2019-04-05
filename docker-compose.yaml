@@ -51,6 +51,29 @@ services:
       "
     stop_signal: SIGKILL
 
+  makecents-key-tp-python:
+    build:
+      context: .
+      dockerfile: examples/makecents_key_python/Dockerfile
+      args:
+        - http_proxy
+        - https_proxy
+        - no_proxy
+    image: makecents-key-tp-python-local:${ISOLATION_ID}
+    volumes:
+      - ./:/project/sawtooth-sdk-python
+    container_name: makecents-key-tp-python-local
+    depends_on:
+      - validator
+    command: |
+      bash -c "
+        bin/protogen
+        cd examples/makecents_key_python
+        python3 setup.py clean --all
+        python3 setup.py build
+        intkey-tp-python -vv -C tcp://validator:4004
+      "
+    stop_signal: SIGKILL
 
   xo-tp-python:
     build:
